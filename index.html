@@ -1,134 +1,230 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HTML+CSS 伸缩式导航栏</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
   <style>
-    * {
-      /* 页面初始化 清除页面元素原有的内外边距 */
-      padding: 0;
-      margin: 0;
+    html {
+      box-sizing: border-box;
+      --bgColorMenu: #1d1d27;
+      --duration: .7s;
+    }
+
+    html *,
+    html *::before,
+    html *::after {
+      box-sizing: inherit;
     }
 
     body {
-      height: 100vh;
-      /* 背景渐变色 */
-      background: linear-gradient(#99f, #f99);
-    }
-
-    body,
-    .navbar,
-    .navbar ul {
-      /* 三个元素都需要弹性布局 写一块 */
+      margin: 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .navbar {
-      /* 相对定位 */
-      position: relative;
-      padding: 20px;
-      border-radius: 50px;
-      background-color: #fff;
-    }
-
-    .navbar input {
-      width: 40px;
-      height: 40px;
-      /* 鼠标移入变小手 */
-      cursor: pointer;
-      /* 不透明度为0 直接变透明 */
-      opacity: 0;
-    }
-
-    .navbar span {
-      /* 绝对定位 */
-      position: absolute;
-      left: 25px;
-      /* 现将两条线都放到一起 然后单独设置第二条线的位置 calc方法可以自动计算数值 */
-      top: calc(50% - 10px);
-      width: 30px;
-      height: 4px;
-      border-radius: 15px;
-      background-color: #999;
-      /* 这里在解决一个问题 现在span覆盖着复选框 我们鼠标放到span点不中复选框  写这个属性就能解决这个问题 即便鼠标放到span上点击也能够选中或者未选中复选框*/
-      pointer-events: none;
-      /* 收回来的时候过渡刚好相反 */
-      transition: transform 0.3s ease-in-out, top 0.3s ease-in-out 0.3s;
-    }
-
-    /* 因为第二条线在navbar这个元素内的第三个位置 所以这里写3 */
-    .navbar span:nth-child(3) {
-      top: calc(50% + 6px);
-    }
-
-    .navbar ul {
-      width: 0;
-      /* 溢出隐藏 */
+      height: 100vh;
       overflow: hidden;
-      /* 现在这个盒子是扁的 待会解决这个问题 */
-      /* 这个问题出现的原因是 文字被换行显示了 两个汉字竖着排列了 就撑大盒子了 */
-      /* 这个属性可以让文字就在一行排列 不换行 */
-      white-space: nowrap;
-      transition: all 0.5s;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffb457;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color var(--duration);
     }
 
-    .navbar ul li {
-      list-style: none;
-      margin: 0 15px;
+    .menu {
+      margin: 0;
+      display: flex;
+      /* Works well with 100% width  */
+      width: 32.05em;
+      font-size: 1.5em;
+      padding: 0 2.85em;
+      position: relative;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bgColorMenu);
     }
 
-    .navbar ul li a {
-      /* 取消下划线 */
-      text-decoration: none;
-      font-size: 20px;
-      font-weight: 700;
-      color: #333;
+    .menu__item {
+      all: unset;
+      flex-grow: 1;
+      z-index: 100;
+      display: flex;
+      cursor: pointer;
+      position: relative;
+      border-radius: 50%;
+      align-items: center;
+      will-change: transform;
+      justify-content: center;
+      padding: 0.55em 0 0.85em;
+      transition: transform var(--timeOut, var(--duration));
     }
 
-    .navbar ul li a:hover {
-      color: #fb7299;
+    .menu__item::before {
+      content: "";
+      z-index: -1;
+      width: 4.2em;
+      height: 4.2em;
+      border-radius: 50%;
+      position: absolute;
+      transform: scale(0);
+      transition: background-color var(--duration), transform var(--duration);
     }
 
-    /* :checked是当选中的复选框的时候 ~ 是兄弟选择器 查找同一级的ul */
-    .navbar input:checked~ul {
-      width: 350px;
+    .menu__item.active {
+      transform: translate3d(0, -.8em, 0);
     }
 
-    .navbar input:checked~span:nth-child(2) {
-      top: calc(50% - 2px);
-      transform: rotate(-45deg);
-      background-color: #fb7299;
-      /* 现在速度太快了 加个过渡 */
-      /* 这是先执行top 然后.3s后执行transform */
-      transition: top 0.3s ease-in-out, transform 0.3s ease-in-out 0.3s;
+    .menu__item.active::before {
+      transform: scale(1);
+      background-color: var(--bgColorItem);
     }
 
-    .navbar input:checked~span:nth-child(3) {
-      top: calc(50% - 2px);
-      transform: rotate(45deg);
-      background-color: #fb7299;
-      transition: top 0.3s ease-in-out, transform 0.3s ease-in-out 0.3s;
+    .icon {
+      width: 2.6em;
+      height: 2.6em;
+      stroke: white;
+      fill: transparent;
+      stroke-width: 1pt;
+      stroke-miterlimit: 10;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 400;
+    }
+
+    .menu__item.active .icon {
+      animation: strok 1.5s reverse;
+    }
+
+    @keyframes strok {
+      100% {
+        stroke-dashoffset: 400;
+      }
+    }
+
+    .menu__border {
+      left: 0;
+      bottom: 99%;
+      width: 10.9em;
+      height: 2.4em;
+      position: absolute;
+      clip-path: url(#menu);
+      will-change: transform;
+      background-color: var(--bgColorMenu);
+      transition: transform var(--timeOut, var(--duration));
+    }
+
+    .svg-container {
+      width: 0;
+      height: 0;
+    }
+
+    @media screen and (max-width: 50em) {
+      .menu {
+        font-size: .8em;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="navbar">
-    <input type="checkbox" />
-    <span></span>
-    <span></span>
-    <ul>
-      <li><a href="javascript:void(0)">点赞</a></li>
-      <li><a href="javascript:void(0)">投币</a></li>
-      <li><a href="javascript:void(0)">收藏</a></li>
-      <li><a href="javascript:void(0)">关注</a></li>
-      <li><a href="javascript:void(0)">分享</a></li>
-    </ul>
+  <menu class="menu">
+
+    <button class="menu__item active" style="--bgColorItem: #ff8c00;">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M3.8,6.6h16.4" />
+        <path d="M20.2,12.1H3.8" />
+        <path d="M3.8,17.5h16.4" />
+      </svg>
+    </button>
+
+    <button class="menu__item" style="--bgColorItem: #f54888;">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M6.7,4.8h10.7c0.3,0,0.6,0.2,0.7,0.5l2.8,7.3c0,0.1,0,0.2,0,0.3v5.6c0,0.4-0.4,0.8-0.8,0.8H3.8
+                C3.4,19.3,3,19,3,18.5v-5.6c0-0.1,0-0.2,0.1-0.3L6,5.3C6.1,5,6.4,4.8,6.7,4.8z" />
+        <path d="M3.4,12.9H8l1.6,2.8h4.9l1.5-2.8h4.6" />
+      </svg>
+    </button>
+
+    <button class="menu__item" style="--bgColorItem: #4343f5;">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M3.4,11.9l8.8,4.4l8.4-4.4" />
+        <path d="M3.4,16.2l8.8,4.5l8.4-4.5" />
+        <path d="M3.7,7.8l8.6-4.5l8,4.5l-8,4.3L3.7,7.8z" />
+      </svg>
+    </button>
+
+    <button class="menu__item" style="--bgColorItem: #e0b115;">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M5.1,3.9h13.9c0.6,0,1.2,0.5,1.2,1.2v13.9c0,0.6-0.5,1.2-1.2,1.2H5.1c-0.6,0-1.2-0.5-1.2-1.2V5.1
+              C3.9,4.4,4.4,3.9,5.1,3.9z" />
+        <path d="M4.2,9.3h15.6" />
+        <path d="M9.1,9.5v10.3" />
+      </svg>
+    </button>
+
+    <button class="menu__item" style="--bgColorItem:#65ddb7;">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M5.1,3.9h13.9c0.6,0,1.2,0.5,1.2,1.2v13.9c0,0.6-0.5,1.2-1.2,1.2H5.1c-0.6,0-1.2-0.5-1.2-1.2V5.1
+              C3.9,4.4,4.4,3.9,5.1,3.9z" />
+        <path d="M5.5,20l9.9-9.9l4.7,4.7" />
+        <path d="M10.4,8.8c0,0.9-0.7,1.6-1.6,1.6c-0.9,0-1.6-0.7-1.6-1.6C7.3,8,8,7.3,8.9,7.3C9.7,7.3,10.4,8,10.4,8.8z" />
+      </svg>
+    </button>
+
+    <div class="menu__border"></div>
+
+  </menu>
+
+  <div class="svg-container">
+    <svg viewBox="0 0 202.9 45.5">
+      <clipPath id="menu" clipPathUnits="objectBoundingBox" transform="scale(0.0049285362247413 0.021978021978022)">
+        <path d="M6.7,45.5c5.7,0.1,14.1-0.4,23.3-4c5.7-2.3,9.9-5,18.1-10.5c10.7-7.1,11.8-9.2,20.6-14.3c5-2.9,9.2-5.2,15.2-7
+              c7.1-2.1,13.3-2.3,17.6-2.1c4.2-0.2,10.5,0.1,17.6,2.1c6.1,1.8,10.2,4.1,15.2,7c8.8,5,9.9,7.1,20.6,14.3c8.3,5.5,12.4,8.2,18.1,10.5
+              c9.2,3.6,17.6,4.2,23.3,4H6.7z" />
+      </clipPath>
+    </svg>
   </div>
 </body>
+<script>
+  "use strict";
+
+  const body = document.body;
+  const bgColorsBody = ["#ffb457", "#ff96bd", "#9999fb", "#ffe797", "#cffff1"];
+  const menu = body.querySelector(".menu");
+  const menuItems = menu.querySelectorAll(".menu__item");
+  const menuBorder = menu.querySelector(".menu__border");
+  let activeItem = menu.querySelector(".active");
+
+  function clickItem(item, index) {
+    menu.style.removeProperty("--timeOut");
+    if (activeItem == item) return;
+
+    if (activeItem) {
+      activeItem.classList.remove("active");
+    }
+
+    item.classList.add("active");
+    body.style.backgroundColor = bgColorsBody[index];
+    activeItem = item;
+    offsetMenuBorder(activeItem, menuBorder);
+  }
+
+  function offsetMenuBorder(element, menuBorder) {
+    const offsetActiveItem = element.getBoundingClientRect();
+    const left = Math.floor(offsetActiveItem.left - menu.offsetLeft - (menuBorder.offsetWidth - offsetActiveItem.width) / 2) + "px";
+    menuBorder.style.transform = `translate3d(${left}, 0 , 0)`;
+  }
+
+  offsetMenuBorder(activeItem, menuBorder);
+
+  menuItems.forEach((item, index) => {
+    item.addEventListener("click", () => clickItem(item, index));
+  })
+
+  window.addEventListener("resize", () => {
+    offsetMenuBorder(activeItem, menuBorder);
+    menu.style.setProperty("--timeOut", "none");
+  });
+</script>
 
 </html>
